@@ -9,8 +9,9 @@ COPY package*.json ./
 COPY vite.config.js ./
 # Instalar dependencias
 RUN npm ci
-# Copiar recursos estáticos (JS, CSS, Imágenes)
-COPY resources/ ./resources/
+# Copiar TODO el proyecto para que Vite pueda escanear las vistas de Blade si es necesario
+# y tenga acceso a cualquier asset que resida en public/
+COPY . .
 # Ejecutar compilación de Vite
 RUN npm run build
 
@@ -53,8 +54,9 @@ COPY --from=node-builder /app/public/build ./public/build
 
 # Instalar dependencias de Composer optimizadas para producción
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-# IMPORTANTE: No ejecutamos scripts que asuman que la BD está lista o que dependan de .env
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+# IMPORTANTE: Eliminamos --no-scripts para permitir que Laravel ejecute 'package:discover'
+# y reconozca todos los ServiceProviders de los paquetes correctamente.
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Aplicar permisos correctos a carpetas críticas
 RUN chown -R www-data:www-data /var/www/html \
