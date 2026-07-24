@@ -1,11 +1,7 @@
 services:
   - type: web
     name: cafe-aurora
-    env: php
-    buildCommand: "./build.sh"
-    # El entorno PHP de Render utiliza Apache.
-    # No se requiere un startCommand personalizado si la carpeta webroot se establece en public.
-    # Render detectará public/ automáticamente o se puede configurar en el Dashboard.
+    runtime: docker
     envVars:
       - key: APP_ENV
         value: production
@@ -21,5 +17,3 @@ services:
         value: database
       - key: DB_CONNECTION
         value: mysql
-      - key: APP_KEY
-        sync: false
